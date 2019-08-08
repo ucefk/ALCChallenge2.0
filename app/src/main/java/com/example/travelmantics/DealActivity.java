@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.StorageReference;
@@ -27,7 +28,7 @@ import com.squareup.picasso.Picasso;
 public class DealActivity extends AppCompatActivity {
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDatabaseReference;
-    private static final int PICTURE_RESULT = 42; //the answer to everything
+    private static final int PICTURE_RESULT = 42;
     EditText txtTitle;
     EditText txtDescription;
     EditText txtPrice;
@@ -43,7 +44,7 @@ public class DealActivity extends AppCompatActivity {
         txtTitle = (EditText) findViewById(R.id.txtTitle);
         txtDescription = (EditText) findViewById(R.id.txtDescription);
         txtPrice = (EditText) findViewById(R.id.txtPrice);
-        btnImage = (Button) findViewById(R.id.btnImage);
+        btnImage = findViewById(R.id.btnImage);
         imageView = (ImageView) findViewById(R.id.image);
         Intent intent = getIntent();
         TravelDeal deal = (TravelDeal) intent.getSerializableExtra("Deal");
@@ -72,7 +73,6 @@ public class DealActivity extends AppCompatActivity {
             case R.id.save_menu:
                 saveDeal();
                 Toast.makeText(this, "Deal saved", Toast.LENGTH_LONG).show();
-                clean();
                 backToList();
                 return true;
             case R.id.delete_menu:
@@ -101,7 +101,7 @@ public class DealActivity extends AppCompatActivity {
         else {
             menu.findItem(R.id.delete_menu).setVisible(false);
             menu.findItem(R.id.save_menu).setVisible(false);
-            menu.findItem(R.id.insert_menu).setVisible(false);
+            //menu.findItem(R.id.insert_menu).setVisible(false);
             enableEditTexts(false);
             btnImage.setVisibility(View.GONE);
         }
@@ -119,6 +119,23 @@ public class DealActivity extends AppCompatActivity {
             ref.putFile(imageUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Task<Uri> url = taskSnapshot.getStorage().getDownloadUrl();
+                    while
+                    (!url.isSuccessful());
+                    Uri download = url.getResult();
+                    String urlString = download.toString();
+                    String pictureName = taskSnapshot.getStorage().getPath();
+                    deal.setImageUrl(urlString);
+                    deal.setImageName(pictureName);
+                    Log.d("url", urlString);
+                    Log.d("Name", pictureName);
+                    showImage(urlString );
+                }
+            });
+            /*
+            ref.putFile(imageUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
                     String url = ref.getDownloadUrl().toString();
                     //String url = taskSnapshot.getDownloadUrl().toString();
@@ -130,7 +147,7 @@ public class DealActivity extends AppCompatActivity {
                     showImage(url);
                 }
             });
-
+            */
         }
     }
 
